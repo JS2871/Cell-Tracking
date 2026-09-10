@@ -91,16 +91,16 @@ flowchart LR
 
 ### Step 0 — EDA
 
-📓 [`notebook/0_EDA.ipynb`](notebook/0_EDA.ipynb)
+📓 [`notebook_github/0_EDA.ipynb`](notebook_github/0_EDA.ipynb)
 
 Exploratory data analysis of the raw data using two example datasets.
 
 ### Step 1 — Cellpose-SAM Segmentation
 
-📓 [`notebook/01_cellpose_sam_segmentation.ipynb`](notebook/01_cellpose_sam_segmentation.ipynb)
+📓 [`notebook_github/01_cellpose_sam_segmentation.ipynb`](notebook_github/01_cellpose_sam_segmentation.ipynb)
 
 1. Reuse the existing geff/zarr loading pattern from
-   [`notebook/Prac_20260723_analysis.ipynb`](notebook/Prac_20260723_analysis.ipynb).
+   [`notebook_github/0_EDA.ipynb`](notebook_github/0_EDA.ipynb).
 2. Run Cellpose-SAM on a small local subset first (one sample each from `44b6` and `6bba`, a handful
    of timepoints / a cropped subvolume) to validate pipeline logic on CPU in reasonable time.
 3. Run in 3D mode, explicitly accounting for the ~4× z-anisotropy — either pass the real voxel
@@ -119,7 +119,7 @@ Exploratory data analysis of the raw data using two example datasets.
 
 ### Step 2 — Cell Token Design
 
-📓 [`notebook/02_cell_tokens.ipynb`](notebook/02_cell_tokens.ipynb)
+📓 [`notebook_github/02_cell_tokens.ipynb`](notebook_github/02_cell_tokens.ipynb)
 
 Each cell instance becomes a token:
 
@@ -136,7 +136,7 @@ Z_{i,t} = [e_image, e_fluorescence, e_morphology, x, y, z, t]
 
 ### Step 3 — Learned Affinity + Graph Solver
 
-📓 [`notebook/03_tracking_solver.ipynb`](notebook/03_tracking_solver.ipynb)
+📓 [`notebook_github/03_tracking_solver.ipynb`](notebook_github/03_tracking_solver.ipynb)
 
 1. **Candidate edges** — `tracksdata.edges.DistanceEdges` at the competition's 7 µm physical radius
    (reuses the same proven mechanism as the classical baseline).
@@ -158,7 +158,7 @@ Z_{i,t} = [e_image, e_fluorescence, e_morphology, x, y, z, t]
 
 ```text
 .
-├── notebook/
+├── notebook_github/
 │   ├── Overview.ipynb                      # Full competition narrative
 │   ├── 0_EDA.ipynb                         # Step 0 — exploratory data analysis
 │   ├── 01_cellpose_sam_segmentation.ipynb  # Step 1 — segmentation
