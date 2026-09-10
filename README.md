@@ -164,7 +164,7 @@ Z_{i,t} = [e_image, e_fluorescence, e_morphology, x, y, z, t]
 │   ├── 01_cellpose_sam_segmentation.ipynb  # Step 1 — segmentation
 │   ├── 02_cell_tokens.ipynb                # Step 2 — per-cell feature tokens
 │   ├── 03_tracking_solver.ipynb            # Step 3 — affinity model + graph solver
-│   └── Prac_20260723_analysis.ipynb        # geff/zarr loading patterns
+│   └── 0_EDA.ipynb                         # geff/zarr loading patterns
 ├── CLAUDE.md                               # Condensed operational facts
 └── README.md
 ```
