@@ -44,9 +44,8 @@ id,dataset,row_type,node_id,t,z,y,x,source_id,target_id
 ## Data
 - Raw data: /mnt/d/KAGGLE/data/biohub-cell-tracking-during-development.zip
 
-## Repo layout
-- `notebook/` — exploratory/reference notebooks (`Overview.ipynb` = competition spec, not to be edited).
-- (add `src/`, `data/`, `submissions/` etc. here as they're created)
+## EDA notebook
+- ./notebook/0_EDA.ipynb: EDA of raw data with two example datasets 
 
-## Notebook write
+## Notebook write in this directory
 ./notebook

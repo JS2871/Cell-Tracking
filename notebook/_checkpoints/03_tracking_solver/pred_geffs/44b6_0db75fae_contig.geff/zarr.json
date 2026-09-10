@@ -1,0 +1,416 @@
+{
+  "attributes": {
+    "geff": {
+      "geff_version": "1.1",
+      "directed": true,
+      "axes": [
+        {
+          "name": "t",
+          "type": "time",
+          "unit": null,
+          "min": 29.0,
+          "max": 38.0,
+          "scale": null,
+          "scaled_unit": null,
+          "offset": null
+        },
+        {
+          "name": "z",
+          "type": "space",
+          "unit": null,
+          "min": 17.854077253218883,
+          "max": 28.107692307692307,
+          "scale": null,
+          "scaled_unit": null,
+          "offset": null
+        },
+        {
+          "name": "y",
+          "type": "space",
+          "unit": null,
+          "min": 113.20881670533643,
+          "max": 143.89393939393938,
+          "scale": null,
+          "scaled_unit": null,
+          "offset": null
+        },
+        {
+          "name": "x",
+          "type": "space",
+          "unit": null,
+          "min": 30.540372670807454,
+          "max": 92.92343387470999,
+          "scale": null,
+          "scaled_unit": null,
+          "offset": null
+        }
+      ],
+      "node_props_metadata": {
+        "t": {
+          "identifier": "t",
+          "dtype": "int32",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "z": {
+          "identifier": "z",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "y": {
+          "identifier": "y",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "x": {
+          "identifier": "x",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "volume_um3": {
+          "identifier": "volume_um3",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "surface_area_um2": {
+          "identifier": "surface_area_um2",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "elongation": {
+          "identifier": "elongation",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "sphericity": {
+          "identifier": "sphericity",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "solidity": {
+          "identifier": "solidity",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "mean_intensity": {
+          "identifier": "mean_intensity",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "std_intensity": {
+          "identifier": "std_intensity",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "p10": {
+          "identifier": "p10",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "p50": {
+          "identifier": "p50",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "p90": {
+          "identifier": "p90",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "integrated_intensity": {
+          "identifier": "integrated_intensity",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "z_vox": {
+          "identifier": "z_vox",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "y_vox": {
+          "identifier": "y_vox",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "x_vox": {
+          "identifier": "x_vox",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "z_um": {
+          "identifier": "z_um",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "y_um": {
+          "identifier": "y_um",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "x_um": {
+          "identifier": "x_um",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_0": {
+          "identifier": "hist_0",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_1": {
+          "identifier": "hist_1",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_2": {
+          "identifier": "hist_2",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_3": {
+          "identifier": "hist_3",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_4": {
+          "identifier": "hist_4",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_5": {
+          "identifier": "hist_5",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_6": {
+          "identifier": "hist_6",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_7": {
+          "identifier": "hist_7",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_8": {
+          "identifier": "hist_8",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_9": {
+          "identifier": "hist_9",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_10": {
+          "identifier": "hist_10",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_11": {
+          "identifier": "hist_11",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_12": {
+          "identifier": "hist_12",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_13": {
+          "identifier": "hist_13",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_14": {
+          "identifier": "hist_14",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "hist_15": {
+          "identifier": "hist_15",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "solution": {
+          "identifier": "solution",
+          "dtype": "bool",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "match_node_id": {
+          "identifier": "match_node_id",
+          "dtype": "int64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "match_score": {
+          "identifier": "match_score",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        }
+      },
+      "edge_props_metadata": {
+        "distance": {
+          "identifier": "distance",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "ml_weight": {
+          "identifier": "ml_weight",
+          "dtype": "float64",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "solution": {
+          "identifier": "solution",
+          "dtype": "bool",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        },
+        "matched_edge_mask": {
+          "identifier": "matched_edge_mask",
+          "dtype": "bool",
+          "varlength": false,
+          "unit": null,
+          "name": null,
+          "description": null
+        }
+      },
+      "sphere": null,
+      "ellipsoid": null,
+      "track_node_props": null,
+      "related_objects": null,
+      "display_hints": null,
+      "extra": {
+        "tracksdata": {}
+      }
+    }
+  },
+  "zarr_format": 3,
+  "node_type": "group"
+}

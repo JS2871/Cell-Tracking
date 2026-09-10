@@ -1,0 +1,206 @@
+BIOHUB CELL TRACKING — PIPELINE DESIGN DISCUSSION
+Date: 2026-09-06
+
+============================================================
+GOAL
+============================================================
+Detect, track, and link cells across time in 3D microscopy data, including
+detecting cell divisions and reconstructing lineages. Proposed 3-step
+workflow:
+
+  Step 1: Cell segmentation (Cellpose-SAM)
+  Step 2: Per-cell feature representation (tokens)
+  Step 3: Transformer-based tracking across time, including mitosis detection
+
+Three questions this plan answers:
+  1) How do we recognize cell identity from voxels?
+  2) How do we track a cell as time passes?
+  3) How do we recognize a mitosis (division) event?
+
+============================================================
+DATA FACTS THAT SHAPE THE DESIGN
+============================================================
+- Each sample: zarr v3 array, shape (T=100, Z=64, Y=256, X=256), uint16,
+  single fluorescence channel.
+- Physical voxel scale: z=1.625 um, y=x=0.40625 um  -> ~4x anisotropy in z.
+  This exact scale is also used by the competition's evaluation metric.
+- Ground truth is a "geff" zarr group:
+    nodes/ids                        (N,) uint64
+    nodes/props/{t,z,y,x}/values     (N,) int64 each
+    edges/ids                        (E,2) uint64  (source, target)
+  IMPORTANT: there are NO instance masks in the ground truth — only sparse
+  point/graph annotations. Not every frame or every cell is labeled.
+  A division = a node with >= 2 outgoing edges; divisions are rare but
+  present in the data.
+- Two dataset regimes by filename prefix: "44b6" (denser) and "6bba"
+  (sparser). Worth evaluating separately since they may behave differently.
+
+============================================================
+ENVIRONMENT
+============================================================
+Decision: extend the existing `biohub` conda env (Python 3.11) rather than
+build a new one. It already has zarr, geff, geff-spec, tracksdata (editable
+install pointing at a now-deleted local checkout, needs reinstalling from
+PyPI), networkx, scikit-image, and a CPU-only build of torch.
+
+No GPU is reachable from this WSL2 session (no nvidia-smi, no /dev/nvidia*).
+cellpose is not installed anywhere yet.
+
+Actions taken:
+  - pip install cellpose (SAM-based "cpsam" model support) into `biohub`
+  - reinstall tracksdata from PyPI into `biohub`
+  - export an environment spec so this is reproducible going forward
+    (nothing was previously checked into the repo pinning these versions)
+
+Because there is no local GPU, Cellpose-SAM prototyping happens on small
+local subsets (CPU) to validate the pipeline logic; full-scale segmentation
+runs belong on Kaggle's GPU notebook environment.
+
+============================================================
+PRIOR WORK
+============================================================
+A "classical" baseline (local-maxima detection via peak_local_max +
+tracksdata NearestNeighborsSolver with max_children=2 to allow divisions)
+existed early in this project's history but was deleted from disk (still
+recoverable from git history, commit a5e1373). Decision: do not restore it —
+build fresh — but its pattern (candidate edges via tracksdata's
+DistanceEdges at the competition's 7 um radius, and max_children=2 for
+divisions) is reused as the reference design for Step 3's solver.
+
+============================================================
+ANSWERS TO THE THREE CORE QUESTIONS
+============================================================
+
+1) Cell identity from voxels
+   Step 1 (Cellpose-SAM instance segmentation) produces per-timepoint
+   candidate instances. Step 2 (feature tokens) gives each instance a
+   descriptor (image embedding, morphology, fluorescence/intensity stats,
+   position). Together these answer "what is a cell at this instant" — but
+   NOT identity persistence across time; that is Step 3's job.
+
+   Caveat: segmentation quality is the ceiling on everything downstream.
+   Morphology and fluorescence features are computed from predicted masks,
+   so segmentation errors propagate directly into the tracker.
+
+2) Tracking as time passes
+   A transformer alone does not perform assignment — it needs a decision
+   layer on top of its scores. Design: a small model scores pairwise
+   affinity between cell tokens in consecutive (or nearby) frames; those
+   scores become edge weights fed into tracksdata's graph solver, which
+   actually produces the linked graph. Candidate edges are restricted to the
+   competition's 7 um physical radius (DistanceEdges), same as the eval
+   metric — this keeps the search space small and consistent with how the
+   submission will be scored.
+
+3) Recognizing mitosis
+   A plain 1-to-1 bipartite tracker cannot produce divisions by
+   construction. Two options:
+     (a) MVP: configure the solver to allow up to 2 children per node
+         (max_children=2), same as the old classical baseline. Divisions
+         emerge wherever the learned affinity supports two roughly equally
+         good daughters.
+     (b) Refinement: add an explicit division-probability head on cell
+         tokens, trained on ground-truth division labels, to bias the
+         solver toward keeping 2 edges only at true division points. This
+         matters because divisions are rare (class imbalance) — relying
+         purely on emergent behavior from a generic affinity threshold
+         risks over- or under-predicting them.
+   Start with (a), layer in (b) once the MVP tracker is working.
+
+IMPORTANT VALIDATION CAVEAT
+   Because ground truth is sparse and point-only (no masks), Step 1
+   validation must use CENTROID MATCHING, not IoU. A predicted cell with no
+   matching ground-truth point might be a real, simply-unannotated cell
+   rather than a genuine false positive. Precision/recall from this step is
+   a useful proxy for segmentation quality, not the actual competition
+   metric (edge_jaccard + 0.1 * division_jaccard).
+
+============================================================
+STEP 1 — CELLPOSE-SAM SEGMENTATION (implemented)
+============================================================
+Notebook: notebook/01_cellpose_sam_segmentation.ipynb
+
+Contents:
+  1. Reuse the existing geff/zarr loading pattern from
+     notebook/20260723_analysis.ipynb.
+  2. Run Cellpose-SAM on a small local subset first (one sample from each of
+     44b6 and 6bba, a handful of timepoints / cropped subvolume) to validate
+     pipeline logic on CPU in reasonable time.
+  3. Run in 3D mode, explicitly accounting for the ~4x z-anisotropy (either
+     pass real voxel spacing to Cellpose or resample z closer to isotropic
+     — decide empirically by comparing mask quality).
+  4. Validate against geff: match predicted mask centroids to ground-truth
+     node centroids per labeled frame using the same scaled-distance
+     bipartite matching as the official metric (linear_sum_assignment,
+     Euclidean distance in physical microns using the
+     [1.625, 0.40625, 0.40625] scale, 7.0 um cutoff). Compute per-frame
+     TP/FP/FN -> precision/recall/F1, reported separately for 44b6 vs 6bba.
+  5. Success criterion: notebook runs end-to-end and produces detection
+     precision/recall numbers per dataset regime. No fixed target threshold
+     yet — the numbers are the artifact to review before deciding whether
+     to tune Cellpose-SAM (diameter, flow threshold, etc.) or move to Step 2.
+
+============================================================
+STEP 2 — CELL TOKEN DESIGN (design only, not yet implemented)
+============================================================
+Notebook: notebook/02_cell_tokens.ipynb
+
+Z_{i,t} = [e_image, e_fluorescence, e_morphology, x, y, z, t]
+
+  e_morphology:    skimage.measure.regionprops_table on the mask, computed
+                    in PHYSICAL units (respecting anisotropic voxel size) —
+                    volume, surface area, elongation, sphericity, solidity.
+
+  e_fluorescence:   the data is single-channel, so this is intensity
+                    statistics within the mask (mean/std/percentiles,
+                    integrated intensity) — not multi-channel unmixing.
+                    Named this way to match the original proposal, but it's
+                    really "intensity features," not a separate channel.
+
+  e_image:          MVP should NOT train a new image encoder from scratch.
+                    Reuse Cellpose-SAM's own ViT-based (SAM) image
+                    embeddings, extracted per predicted cell instance.
+                    Fallback if that proves impractical: a simple
+                    handcrafted placeholder (e.g. patch intensity
+                    histogram), so the Step 3 graph-solving pipeline can be
+                    validated end-to-end before investing in a learned
+                    encoder.
+
+  position/time:    mask centroid in physical microns + frame index —
+                    already available from segmentation output.
+
+============================================================
+STEP 3 — LEARNED AFFINITY + GRAPH SOLVER (design only, not yet implemented)
+============================================================
+Notebook: notebook/03_tracking_solver.ipynb
+
+1. Candidate edges: tracksdata.edges.DistanceEdges at the competition's
+   7 um physical radius (reuses the same proven mechanism as the old
+   classical baseline).
+2. Affinity model: a small MLP/transformer scores pairs
+   (Z_{i,t}, Z_{j,t+1}) for candidate edges, trained on ground-truth edges
+   as positives and other candidates as negatives. Because ground truth is
+   temporally sparse, mask the loss to only frame-pairs/regions where both
+   frames have ground-truth nodes.
+3. Solving: feed learned scores as edge weights into a tracksdata solver
+   configured for max_children=2 (allows divisions), rather than strict
+   1-to-1 matching. Need to check the freshly-installed tracksdata package
+   (PyPI, since the old local editable checkout is gone) for which solver
+   variants accept externally-supplied edge weights vs. only raw distance.
+4. Division handling: MVP relies on the solver's max_children=2 policy (as
+   the old baseline did). Refinement: explicit division-probability
+   auxiliary head per cell token, trained on ground-truth division labels,
+   to suppress spurious 2-child assignments from noisy affinity ties.
+
+============================================================
+NEXT STEPS
+============================================================
+- Review Step 1 notebook's precision/recall numbers together; decide
+  whether segmentation quality is sufficient to proceed to Step 2, or needs
+  tuning first.
+- Implement Step 2 (cell token extraction) once Step 1 segmentation quality
+  is acceptable.
+- Implement Step 3 MVP (learned affinity + tracksdata solver with
+  max_children=2), scored against the actual competition metric
+  (edge_jaccard + 0.1 * division_jaccard), then iterate toward the
+  division-probability head refinement.
